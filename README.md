@@ -1,5 +1,6 @@
 # Certificate-Management-System
 The system allows users to create records, generate certificates automatically, and manage everything from a single dashboard. 
+
 🔹 Key Features 
 • Generate Record Sheet automatically from form input 
 • Auto-generate Calibration Certificate 
