@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <!-- Choices.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Flowbite -->
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.0/dist/flowbite.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.0/dist/flowbite.min.css" rel="stylesheet">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+
+  <!-- Simple Datatables -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script> -->
+
+  <style>
+    /* Cleaned up CSS variables - removed duplicates */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      --light-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #2ecc71;
+      --accent: #ff6b6b;
+      --dark: #2d3436;
+      --light: #f8f9fa;
+      --gray: #adb5bd;
+      --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--dark);
+    }
+
+    /* ───────────────── BUTTON ───────────────── */
+    .vendor-open-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      background: var(--accent-gradient);
+      color: rgb(5, 5, 5);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 2000;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      letter-spacing: 0.5px;
+    }
+
+    .vendor-open-btn:hover {
+      color: white;
+      background: var(--secondary-gradient);
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 25px rgba(245, 87, 108, 0.5);
+    }
+
+    /* ───────────────── HEADER ───────────────── */
+    .vendor-header {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      font-weight: 700;
+      border-radius: 0 0 20px 20px;
+      color: white;
+      text-align: center;
+      z-index: 1500;
+      background: var(--dark-gradient);
+      padding: 24px;
+      margin-bottom: 30px;
+      font-size: 28px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ───────────────── CLOSE BUTTON ───────────────── */
+    .vendor-close-btn {
+      position: absolute;
+      top: 24px;
+      right: 30px;
+      font-size: 24px;
+      cursor: pointer;
+      color: rgb(61, 109, 243);
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      backdrop-filter: blur(10px);
+      z-index: 100000;
+    }
+    
+    .vendor-close-btn:hover {
+      color: #ff6b6b;
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
+    /* ───────────────── POPUP / OVERLAY ───────────────── */
+    .vendor-page-container {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 99999;
+      animation: fadeIn 0.3s ease;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .vendor-form-wrapper {
+      background: white;
+      padding: 50px 40px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 1200px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      z-index: 100001;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Container inside popup */
+    .container {
+      max-width: 100%;
+      margin: 0;
+      animation: none;
+    }
+
+    /* Header Styles */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 20px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .header-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Content Layout */
+    .content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+    /* Force dropdown to be on top of everything */
+    .choices.is-open .choices__list--dropdown {
+      z-index: 999999999 !important;
+      /* transform: translateZ(0) !important; */
+    }
+
+    /* Card Styles */
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: visible !important;
+      /* z-index: 1 !important; */
+    }
+
+    .card:hover {
+      /* transform: translateY(-5px); */
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .card-icon {
+      width: 55px;
+      height: 55px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.3;
+    }
+
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+
+    /* Form Styles */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--dark);
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    .required::after {
+      content: " *";
+      color: var(--accent);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 14px 22px;
+      border-radius: 12px;
+      border: 2px solid #e9ecef;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      transition: var(--transition);
+      background: var(--light);
+      color: var(--dark);
+      min-height: 50px;
+      padding-left: 28px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+      background: white;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: var(--gray);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .readonly-field {
+      background-color: #f8f9fa;
+      cursor: not-allowed;
+    }
+
+    /* Button Styles */
+    .btn-generate {
+      width: 100%;
+      padding: 20px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 30px 0;
+      box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-generate:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(67, 97, 238, 0.4);
+    }
+
+    .btn-generate:active:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Result Styles */
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 14px;
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+      background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+      border: 2px solid #e0e7ff;
+      position: relative;
+    }
+
+    .result.success {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      border-color: #c3e6cb;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .result-icon {
+      font-size: 1.8rem;
+      color: var(--secondary);
+    }
+
+    .result h3 {
+      font-size: 1.3rem;
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    .result-content {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .result-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      background: white;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 2px solid transparent;
+    }
+
+    .result-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Custom Select Styles - Fixed for Choices.js */
+    .choices {
+      overflow: visible !important;
+      position: relative;
+      z-index: 1 !important; /* Remove high z-index from parent */
+    }
+    .choices.is-open {
+      overflow: visible !important;
+      z-index: 999999 !important; /* When dropdown is open */
+      position: relative !important;
+    }
+    .choices__inner {
+      position: relative !important;
+      z-index: 1!important;
+      background: var(--light) !important;
+      border: 2px solid #e9ecef !important;
+      border-radius: 12px !important;
+      min-height: 52px !important;
+      padding: 8px 20px !important;
+      transition: var(--transition) !important;
+    }
+
+    .choices.is-open .choices__inner {
+      z-index: 1000000 !important;
+      position: relative !important;
+    }
+    .choices__list--single {
+      padding: 8px 0 !important;
+      position: relative !important;
+    }
+
+    .choices__list--dropdown {
+      position: absolute !important;
+      top: 100% !important;
+      left: 0 !important;
+      width: 100% !important;
+      z-index: 1000000 !important; /* Reduced but still very high */
+      border: 2px solid #e9ecef !important;
+      border-radius: 12px !important;
+      margin-top: 5px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+      background: white !important;
+      max-height: 300px !important;
+      overflow-y: auto !important;
+      overflow: visible !important;
+      visibility: visible !important;
+      will-change: transform; /* Improves rendering performance */
+      transform: none !important;
+    }
+
+    .choices__input {
+      background: transparent !important;
+      margin-bottom: 0 !important;
+      padding: 10px !important;
+    }
+
+    .choices__item {
+      transition: var(--transition) !important;
+    }
+
+    /* Form Validation */
+    .error-message {
+      color: var(--accent);
+      font-size: 0.85rem;
+      margin-top: 8px;
+      display: none;
+    }
+
+    input:invalid, textarea:invalid {
+      border-color: var(--accent);
+    }
+
+    /* Success Animation */
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .success-pulse {
+      animation: successPulse 0.6s ease-out;
+    }
+
+    /* Custom scrollbar for dropdown */
+    .choices__list--dropdown::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .choices__list--dropdown::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .choices__list--dropdown::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    .choices__list--dropdown::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    /* .choices__list--dropdown.choices__list--dropdown {
+      z-index: 999999 !important;
+    } */
+
+    /* ───────────────── TABLE STYLING ───────────────── */
+    .table-container {
+      padding: 20px;
+      margin: 20px auto 40px;
+      width: 95%;
+      max-width: 1400px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .table-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: var(--accent-gradient);
+    }
+
+    #search-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 15px;
+    }
+
+    #search-table thead th {
+      background: var(--primary-gradient);
+      padding: 18px 20px;
+      font-weight: 700;
+      font-size: 15px;
+      color: white;
+      border-bottom: none;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #search-table thead th::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    #search-table tbody td {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #475569;
+      transition: all 0.2s ease;
+    }
+
+    #search-table tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    #search-table tbody tr:hover {
+      background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(245, 87, 108, 0.05) 100%);
+      /* transform: translateX(5px); */
+    }
+
+    #search-table tbody tr:hover td {
+      color: #334155;
+      font-weight: 500;
+    }
+
+    #search-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .vendor-form-wrapper {
+        padding: 30px 20px;
+      }
+      
+      .header {
+        padding: 25px 15px;
+        margin-bottom: 20px;
+      }
+      
+      .header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+      
+      .btn-generate {
+        padding: 16px;
+        font-size: 1rem;
+      }
+      
+      .table-container {
+        padding: 5px;
+        margin: 5px auto;
+      }
+      
+      .vendor-header {
+        font-size: 22px;
+        padding: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .vendor-open-btn {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+      
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .card-title {
+        font-size: 1.1rem;
+      }
+      
+      .result-content {
+        flex-direction: column;
+      }
+      
+      .result-link {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    /* Hit and trial method */
+    .choices__list--dropdown .choices__item--selectable:hover {
+      background: var(--primary);
+      color: Black;
+      transform: translateX(5px);
+      z-index: 9999999999;
+    }
+    /* ================= FINAL CHOICES FIX ================= */
+
+    /* REMOVE ALL TRANSFORMS EFFECT */
+    .card:hover,
+    #search-table tbody tr:hover {
+      transform: none !important;
+    }
+
+    /* FORCE DROPDOWN OUT OF ALL PARENTS */
+    .choices__list--dropdown {
+      position: relative !important;
+      z-index: 2147483647 !important; /* MAX */
+      transform: none !important;
+    }
+
+    /* RESET PARENTS */
+    .card,
+    .vendor-form-wrapper,
+    .choices,
+    .choices.is-open {
+      z-index: auto !important;
+    }
+
+    /* ===== Calibration Table Styling ===== */
+
+    #calibrationTable {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    #calibrationTable th,
+    #calibrationTable td {
+      padding: 8px 10px;
+      vertical-align: middle;
+    }
+
+    #calibrationTable th {
+      font-weight: 600;
+      background: #f3f4f6;
+      text-align: center;
+    }
+
+    /* Input Styling */
+    .table-input {
+      width: 100%;
+      padding: 8px 12px;   /* SPACE INSIDE INPUT */
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      box-sizing: border-box;
+      text-align: left;
+    }
+
+    /* Prevent squeezed look */
+    .table-input:focus {
+      outline: none;
+      border-color: #4361ee;
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.15);
+    }
+
+    /* Readonly styling */
+    .table-input.readonly {
+      background: #f9fafb;
+      font-weight: 500;
+    }
+
+    /* Delete column spacing */
+    .delete-cell {
+      padding-left: 15px;
+      text-align: center;
+    }
+
+    /* Delete button */
+    .delete-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 6px;
+      transition: 0.2s;
+    }
+
+    .delete-btn:hover {
+      color: #ef4444;
+      transform: scale(1.1);
+    }
+
+
+  </style>
+</head>
+
+<body>
+  <!-- CREATE PARTY BUTTON -->
+  <button class="vendor-open-btn" onclick="openVendorForm()">
+    <i class="fa-solid fa-plus mr-2"></i>Create RecordSheet & Certificate
+  </button>
+  
+  <div class="vendor-header">
+    <h2>Certificate Database</h2>
+  </div>
+
+  <!-- POPUP FORM -->
+  <div class="vendor-page-container" id="vendor-formPopup">
+    <div class="vendor-form-wrapper">
+      <button class="vendor-close-btn" onclick="closeVendorForm()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+          <div class="header-content">
+            <div class="header-icon">
+              <i class="fas fa-file-certificate"></i>
+            </div>
+            <h1>Record & Certificate Generator</h1>
+            <p>Create professional calibration records and certificates with ease</p>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+          <!-- SRF Selection Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <div>
+                <div class="card-title">SRF Selection</div>
+                <div class="card-subtitle">Select the Service Request Form to begin</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="required">SRF Number</label>
+              <select id="srfSelect"></select>
+              <div class="error-message" id="srfError">Please select an SRF number</div>
+            </div>
+          </div>
+
+          <!-- Parameter Selection Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <i class="fas fa-sliders-h"></i>
+              </div>
+              <div>
+                <div class="card-title">Parameter Selection</div>
+                <div class="card-subtitle">Choose the calibration parameter</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="required">Parameter ID</label>
+              <select id="parameterSelect"></select>
+              <div class="error-message" id="parameterError">Please select a parameter</div>
+            </div>
+          </div>
+
+          <!-- Record Details Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <div>
+                <div class="card-title">Record Details</div>
+                <div class="card-subtitle">Enter calibration details and specifications</div>
+              </div>
+            </div>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="required">ULR Number</label>
+                <input type="text" id="ulrNo" placeholder="Enter unique ULR number">
+                <div class="error-message" id="ulrError">ULR number is required</div>
+              </div>
+
+              <div class="form-group">
+                <label class="required">Date of Calibration</label>
+                <input type="date" id="calDate">
+                <div class="error-message" id="dateError">Please select a date</div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="required">Instrument Make</label>
+                <input type="text" id="make" placeholder="e.g., Mitutoyo, Mikronix">
+                <div class="error-message" id="makeError">Instrument make is required</div>
+              </div>
+
+              <div class="form-group">
+                <label class="required">Range / Size</label>
+                <input type="text" id="range" placeholder="e.g., 0-100mm, 0-500mm">
+                <div class="error-message" id="rangeError">Range/size is required</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="required">Description</label>
+              <textarea id="description" placeholder="Provide detailed description of the instrument and calibration requirements..."></textarea>
+              <div class="error-message" id="descError">Description is required</div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="required">Calibrated Person</label>
+                <input type="text" id="calibratedperson" list="person-options" placeholder="Select or enter name">
+                <datalist id="person-options">
+                  <option value="Vikrant Singh">Vikrant Singh</option>
+                  <option value="Yash">Yash</option>
+                  <option value="Vaibhav Mangal">Vaibhav Mangal</option>
+                  <option value="Deepak">Deepak</option>
+                </datalist>
+                <div class="error-message" id="personError">Please select a person</div>
+              </div>
+
+              <div class="form-group">
+                <label>Designation</label>
+                <input type="text" id="calibrateddesg" readonly class="readonly-field">
+              </div>
+            </div>
+          </div>
+          <!-- Calibration Results Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <i class="fas fa-table"></i>
+              </div>
+              <div>
+                <div class="card-title">Calibration Results</div>
+                <div class="card-subtitle" id="calibrationSubtitle">Enter measured values – average & error auto calculated</div>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm border" id="calibrationTable">
+                <thead>
+                  <tr class="bg-gray-100 ">
+                    <th>S.No</th>
+                    <th>Accuracy Check</th>
+                    <th>Nominal Value</th>
+                    <th>Measured I</th>
+                    <th>Measured II</th>
+                    <th>Measured III</th>
+                    <th>Avg Measured Value</th>
+                    <th>Error</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <button type="button" class="btn-generate mt-4" onclick="addCalibrationRow()">
+              <i class="fas fa-plus"></i> Add Row
+            </button>
+          </div>
+          <!-- Repeatability Results -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <i class="fas fa-ruler"></i>
+              </div>
+              <div>
+                <div class="card-title">Measured Value at Full Range (Repeatability)</div>
+                <div class="card-subtitle">Enter 5 measured values</div>
+              </div>
+            </div>
+
+            <table class="w-full text-sm border border-gray-300 rounded-lg overflow-hidden" id="repeatTable">
+              <thead>
+                <tr class="bg-gray-100 text-gray-700">
+                  <th class="p-2 border border-gray-300 text-center w-16">S.No</th>
+                  <th class="p-2 border border-gray-300 text-left">Measured value</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td class="border border-gray-300 text-center">1</td>
+                  <td class="border border-gray-300 p-2">
+                    <input type="number" step="any" class="repeat table-input w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  </td>
+                </tr>
+
+                <tr>
+                  <td class="border border-gray-300 text-center">2</td>
+                  <td class="border border-gray-300 p-2">
+                    <input type="number" step="any" class="repeat table-input w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  </td>
+                </tr>
+
+                <tr>
+                  <td class="border border-gray-300 text-center">3</td>
+                  <td class="border border-gray-300 p-2">
+                    <input type="number" step="any" class="repeat table-input w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  </td>
+                </tr>
+
+                <tr>
+                  <td class="border border-gray-300 text-center">4</td>
+                  <td class="border border-gray-300 p-2">
+                    <input type="number" step="any" class="repeat table-input w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  </td>
+                </tr>
+
+                <tr>
+                  <td class="border border-gray-300 text-center">5</td>
+                  <td class="border border-gray-300 p-2">
+                    <input type="number" step="any" class="repeat table-input w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn-generate" id="generateBtn">
+          <i class="fas fa-bolt"></i>
+          <span>Generate Record & Certificate</span>
+        </button>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Creating documents, please wait...</p>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result" class="result success">
+          <div class="result-header">
+            <i class="fas fa-check-circle result-icon"></i>
+            <h3>Documents Created Successfully!</h3>
+          </div>
+          <div class="result-content">
+            <a href="#" class="result-link" id="recordLink" target="_blank">
+              <i class="fas fa-file-alt"></i>
+              <span>Open Record Sheet</span>
+            </a>
+            <a href="#" class="result-link" id="certLink" target="_blank">
+              <i class="fas fa-certificate"></i>
+              <span>Open Certificate</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE ======================================================= execute when the measuring is done-->
+  <div class="table-container">
+    <table id="search-table">
+      <thead>
+        <tr>
+          <th>ULR number</th>
+          <th>SRF No.</th>
+          <th>DOI of report</th>
+          <th>Cal Due Date</th>
+          <th>Record Sheet</th>
+          <th>Certificate PDF</th> 
+          <th>Word Format</th>         
+        </tr>
+      </thead>
+      <tbody id="consumerTableBody">
+      <!-- rows will be injected here -->
+      </tbody>
+    </table>
+  </div>
+  
+  
+  <script>
+    let templates = [];
+    let choicesInstances = [];
+
+    let certTable;
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // Initialize dropdowns
+      document.getElementById('parameterSelect').innerHTML =
+        '<option value="">Select a Parameter ID...</option>';
+      document.getElementById('srfSelect').innerHTML =
+        '<option value="">Select a SRF...</option>';
+
+      loadSRF();
+      loadTemplates();
+      setupEventListeners();
+      setupFormValidation();
+
+      // Load ULR
+      google.script.run
+        .withSuccessHandler(ulr => {
+          document.getElementById('ulrNo').value = ulr;
+        })
+        .ULRCertificateNumber();
+
+      // ✅ Initialize DataTable (ONLY ONCE)
+      certTable = $('#search-table').DataTable({
+        responsive: true,
+        pageLength: 10,
+        order: [[0, 'desc']],
+        columnDefs: [{ targets: [4,5,6], orderable: false }]
+      });
+
+      // Load data
+      loadCertificateTable();
+    });
+
+    function loadSRF() {
+      google.script.run.withSuccessHandler(data => {
+        const sel = document.getElementById('srfSelect');
+        data.forEach(v => {
+          const o = document.createElement('option');
+          o.value = v;
+          o.textContent = v;
+          sel.appendChild(o);
+        });
+        choicesInstances[0] = new Choices(sel, {
+          searchEnabled: true,
+          placeholder: true,
+          searchPlaceholderValue: 'Search SRF...',
+          itemSelectText: '',
+          shouldSort: false
+        });
+      }).getSRFList();
+    }
+
+    function loadTemplates() {
+      google.script.run.withSuccessHandler(data => {
+        templates = data;
+        const sel = document.getElementById('parameterSelect');
+        data.forEach(p => {
+          const o = document.createElement('option');
+          o.value = p.id;
+          o.textContent = p.id;
+          sel.appendChild(o);
+        });
+        choicesInstances[1] = new Choices(sel, {
+          searchEnabled: true,
+          placeholder: true,
+          searchPlaceholderValue: 'Search parameter...',
+          itemSelectText: '',
+          shouldSort: false
+        });
+      }).getTemplatesData();
+    }
+
+    // Designation mapping
+    const designationMap = {
+      "Vikrant Singh": "(Asst. Technical Manager)",
+      "Yash": "(Calibration Technician)",
+      "Vaibhav Mangal": "(Asst. Technical Manager)",
+      "Deepak": "(Calibration Technician)"
+    };
+
+    function setupEventListeners() {
+      // Parameter change event
+      document.getElementById('parameterSelect').addEventListener('change', function () {
+
+        const selectedId = this.value;
+        const selectedTemplate = templates.find(t => t.id === selectedId);
+
+        const subtitle = document.getElementById('calibrationSubtitle');
+
+        if (selectedTemplate && selectedTemplate.Error) {
+          subtitle.innerHTML =
+            `Enter measured values of these accuracy checks:
+            <strong style="color:black">${selectedTemplate.Error}</strong><br>
+            
+            <strong>
+              Uncertainty Sheet Link:
+              <a href="${selectedTemplate.UncSheetLink}" 
+                target="_blank" 
+                style="color:#4361ee; text-decoration:underline;">
+                Open Sheet
+              </a>
+            </strong>
+          `;
+        } else {
+          subtitle.innerHTML =
+            `Enter measured values – average & error auto calculated`;
+        }
+
+      });
+      // Person input event
+      document.getElementById('calibratedperson').addEventListener('input', e => {
+        document.getElementById('calibrateddesg').value = designationMap[e.target.value] || '';
+      });
+
+      // Generate button click
+      document.getElementById('generateBtn').addEventListener('click', generateDocuments);
+    }
+
+    function setupFormValidation() {
+      const formElements = ['ulrNo', 'calDate', 'make', 'range', 'description', 'calibratedperson'];
+      
+      formElements.forEach(id => {
+        const element = document.getElementById(id);
+        const errorElement = document.getElementById(`${id}Error`);
+        
+        if (element) {
+          element.addEventListener('blur', () => validateField(element, errorElement));
+          element.addEventListener('input', () => clearError(element, errorElement));
+        }
+      });
+    }
+
+    function validateField(element, errorElement) {
+      if (!element.value.trim()) {
+        showError(element, errorElement);
+        return false;
+      }
+      clearError(element, errorElement);
+      return true;
+    }
+
+    function showError(element, errorElement) {
+      element.style.borderColor = 'var(--accent)';
+      if (errorElement) errorElement.style.display = 'block';
+    }
+
+    function clearError(element, errorElement) {
+      element.style.borderColor = '';
+      if (errorElement) errorElement.style.display = 'none';
+    }
+
+    function validateForm() {
+      let isValid = true;
+      
+      // Check required fields
+      const requiredFields = [
+        { id: 'srfSelect', error: 'srfError' },
+        { id: 'parameterSelect', error: 'parameterError' },
+        { id: 'ulrNo', error: 'ulrError' },
+        { id: 'calDate', error: 'dateError' },
+        { id: 'make', error: 'makeError' },
+        { id: 'range', error: 'rangeError' },
+        { id: 'description', error: 'descError' },
+        { id: 'calibratedperson', error: 'personError' }
+      ];
+      
+      requiredFields.forEach(field => {
+        const element = document.getElementById(field.id);
+        const errorElement = document.getElementById(field.error);
+        
+        if (!element.value.trim()) {
+          showError(element, errorElement);
+          isValid = false;
+        } else {
+          clearError(element, errorElement);
+        }
+      });
+      
+      return isValid;
+    }
+
+    function randomHum(min, max) {
+      return Math.round((Math.random() * (max - min) + min));
+    }
+
+    async function generateDocuments() {
+      if (!validateForm()) {
+        // Scroll to first error
+        const firstError = document.querySelector('.error-message[style*="block"]');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+      const calibrationData = [];
+      const repeatabilityData = [];
+
+      document.querySelectorAll(".repeat").forEach((inp, i) => {
+        repeatabilityData.push({
+          sno: i + 1,
+          value: inp.value
+        });
+      });
+
+      document.querySelectorAll("#calibrationTable tbody tr").forEach(tr => {
+        calibrationData.push({
+          accuracy: tr.querySelector(".acc").value,
+          nominal: tr.querySelector(".nom").value,
+          m1: tr.querySelector(".m1").value,
+          m2: tr.querySelector(".m2").value,
+          m3: tr.querySelector(".m3").value,
+          avg: tr.querySelector(".avg").value,
+          error: tr.querySelector(".err").value
+        });
+      });
+      const param = templates.find(p => p.id === document.getElementById('parameterSelect').value);
+      const starthum = randomHum(40, 60);
+      const endhum = randomHum(40, 60);
+
+      const payload = {
+        srf: document.getElementById('srfSelect').value,
+        ID: document.getElementById('parameterSelect').value,
+        ulr: document.getElementById('ulrNo').value.trim(),
+        date: document.getElementById('calDate').value.split('-').reverse().join('/'),
+        make: document.getElementById('make').value.trim(),
+        range: document.getElementById('range').value.trim(),
+        desc: document.getElementById('description').value.trim(),
+        startTemp: (20 + Math.random() * 0.15).toFixed(2),
+        endTemp: (19.8 + Math.random() * 0.2).toFixed(2),
+        rhStart: starthum,
+        rhEnd: endhum,
+        calibratedPerson: document.getElementById('calibratedperson').value.trim(),
+        calibratedDesg: document.getElementById('calibrateddesg').value.trim(),
+        template: param,
+        calibrationResults: calibrationData,
+        repeatabilityResults: repeatabilityData
+      };
+
+      // Show loading state
+      const btn = document.getElementById('generateBtn');
+      const loading = document.getElementById('loading');
+      const result = document.getElementById('result');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
+      loading.style.display = 'block';
+      result.style.display = 'none';
+
+      try {
+        const res = await new Promise((resolve, reject) => {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            .generateAll(payload);
+        });
+
+        // Update result links
+        document.getElementById('recordLink').href = res.record.url;
+        document.getElementById('certLink').href = res.cert.url;
+        
+        // ✅ AUTO-REFRESH TABLE HERE
+        loadCertificateTable();
+        // Show success result
+        result.style.display = 'block';
+        result.classList.add('success-pulse');
+        
+        // Scroll to result
+        result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        loadCertificateTable();
+        
+      } catch (error) {
+        // Show error
+        result.innerHTML = `
+          <div class="result-header">
+            <i class="fas fa-exclamation-circle result-icon" style="color: var(--accent)"></i>
+            <h3>Error Creating Documents</h3>
+          </div>
+          <p style="margin-top: 10px; color: var(--dark);">${error.message || 'Unknown error occurred'}</p>
+        `;
+        result.style.display = 'block';
+        result.style.background = 'linear-gradient(135deg, #fdecea, #f9d6d5)';
+        result.style.borderColor = '#f5c6cb';
+      } finally {
+        // Reset button state
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-bolt"></i><span>Generate Record & Certificate</span>';
+        loading.style.display = 'none';
+        
+        // Remove pulse animation after delay
+        setTimeout(() => {
+          result.classList.remove('success-pulse');
+        }, 1000);
+      }
+    }
+
+    // Open Form
+    function openVendorForm() {
+      document.getElementById("vendor-formPopup").style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+    
+    function closeVendorForm() {
+      document.getElementById("vendor-formPopup").style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+
+
+//  For Data table ================================
+
+    function loadCertificateTable() {
+      google.script.run
+        .withSuccessHandler(data => {
+          console.log('DATA FROM SERVER:', data);
+
+          if (!data || data.length === 0) {
+            alert('No data returned from Apps Script');
+            return;
+          }
+
+          certTable.clear();
+
+          data.forEach(row => {
+            certTable.row.add([
+              row.ulr,
+              row.srf,
+              row.issue,
+              row.due,
+              row.record ? `<a href="${row.record}" target="_blank">Open</a>` : '',
+              row.pdf ? `<a href="${row.pdf}" target="_blank">Open</a>` : '',
+              row.word ? `<a href="${row.word}" target="_blank">Open</a>` : ''
+            ]);
+          });
+
+          certTable.draw();
+        })
+        .withFailureHandler(err => {
+          console.error('SERVER ERROR:', err);
+          alert(err.message);
+        })
+        .getCertificateDatabase();
+    }
+    let calibrationResults = [];
+
+    function addCalibrationRow() {
+      const tbody = document.querySelector("#calibrationTable tbody");
+      const rowIndex = tbody.querySelectorAll("tr").length + 1;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="sno">${rowIndex}</td>
+
+        <td><input type="text" class="acc table-input"></td>
+        <td><input type="number" class="nom table-input"></td>
+        <td><input type="number" class="m1 table-input"></td>
+        <td><input type="number" class="m2 table-input"></td>
+        <td><input type="number" class="m3 table-input"></td>
+        <td><input type="number" class="avg table-input readonly" readonly></td>
+        <td><input type="number" class="err table-input readonly" readonly></td>
+
+        <td class="delete-cell">
+          <button onclick="removeRow(this)" class="delete-btn">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+
+      tr.querySelectorAll("input").forEach(inp =>
+        inp.addEventListener("input", () => calculateRow(tr))
+      );
+    }
+
+
+    function calculateRow(tr) {
+      const nom = parseFloat(tr.querySelector(".nom").value) || 0;
+      const m1 = parseFloat(tr.querySelector(".m1").value) || 0;
+      const m2 = parseFloat(tr.querySelector(".m2").value) || 0;
+      const m3 = parseFloat(tr.querySelector(".m3").value) || 0;
+
+      if (m1 || m2 || m3) {
+        const avg = (m1 + m2 + m3) / 3;
+        const err = nom - avg;
+
+        tr.querySelector(".avg").value = avg.toFixed(3);
+        tr.querySelector(".err").value = err.toFixed(3);
+      }
+    }
+
+    function removeRow(btn) {
+      btn.closest("tr").remove();
+      reindexCalibrationRows();
+    }
+
+    function reindexCalibrationRows() {
+      document.querySelectorAll("#calibrationTable tbody tr")
+        .forEach((tr, i) => {
+          tr.children[0].textContent = i + 1;
+        });
+    }
+
+  </script>
+</body>
+</html>
